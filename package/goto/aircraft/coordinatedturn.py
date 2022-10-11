@@ -14,7 +14,7 @@ class CoordinatedTurn() :
 	g = 9.807
 	e = 6371008.7714
 
-	def __init__(self, psidot_max, phi_max, phidot_max=6.0) :
+	def __init__(self, psidot_max, phi_max, phidot_max=12.0) :
 		
 		self.psidot_max = psidot_max # in degrees
 		self.phi_max = phi_max # in degrees
@@ -23,6 +23,11 @@ class CoordinatedTurn() :
 		self.vtr = self.transition_speed()
 
 		print(f">>> psidot={self.psidot_max:0.3g}°/sec, phi={self.phi_max:0.3g}° transition={self.vtr:0.3g} m/s")
+
+	def display_info(self, spd) :
+		print(f"spd = {spd} m/s or {3600*spd/1852} kt")
+		print(f"psidot_limit = {self.psidot_limit(spd)}")
+		print(f"psiddot_limit = {self.psiddot_limit(spd)}")
 
 	def psidot_limit(self, spd) :
 		return min( np.degrees(self.g * np.tan( np.radians(self.phi_max) ) / spd), self.psidot_max )
