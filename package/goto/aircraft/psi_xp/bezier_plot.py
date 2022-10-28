@@ -45,6 +45,44 @@ def bezier_sym(n) :
 # 	print(b11int)
 # 	sys.exit(0)
 
+def minmax_local(p_arr) :
+	n = len(p_arr) // 32
+	q_arr = np.convolve(p_arr, np.ones(len(p_arr)//32), mode='same')
+
+	a_arr = q_arr[:-2]
+	u_arr = q_arr[1:-1]
+	b_arr = q_arr[2:]
+
+	print(a_arr.shape)
+	print(u_arr.shape)
+	print(b_arr.shape)
+
+	x_arr = (u_arr - a_arr) * (b_arr - u_arr)
+	m_arr = np.where(x_arr <= 0.0, np.ones_like(u_arr), np.zeros_like(u_arr))
+	s_arr = np.where((b_arr - u_arr) <= 0.0, np.ones_like(u_arr), -np.ones_like(u_arr))
+
+	r_arr = m_arr * s_arr
+
+	r_lst = sorted([(i[0], 1) for i in np.argwhere(r_arr > 0.5)[-2:]] + [(i[0],-1) for i in np.argwhere(r_arr < -0.5)[-2:]])
+	print(r_lst)
+
+	q_arr = np.convolve(p_arr, np.ones(len(p_arr)//512), mode='same')
+
+	z_lst = list()
+
+	# plt.figure()
+	for r, u in r_lst :
+		z_arr = np.zeros_like(q_arr)
+		e_arr = q_arr[r-n:r+n] * u
+		z_arr[r-n:r+n] = e_arr - np.min(e_arr)
+		z_lst.append((np.argmax(z_arr), u))
+		# plt.plot(z_arr)
+
+	print(z_lst)
+	# plt.show()
+
+	return z_lst
+
 p_lst = [1.0, 1.0, 0.8, 0.6, 0.4, 0.2, 0.0, 0.0, 0.0]
 
 class BezierPlot() :
@@ -244,6 +282,13 @@ class BezierPlot() :
 		m['psi2'] = np.hstack(([math.nan,], (m['psi1'][1:] - m['psi1'][:-1]) / self.dg.dt))
 		m['psi3'] = np.hstack(([math.nan,], (m['psi2'][1:] - m['psi2'][:-1]) / self.dg.dt))
 
+		z_lst = minmax_local(m['psi3'])
+
+		score = math.inf
+		if [i[1] for i in z_lst] == [-1, 1, -1, 1] :
+			print(m['psi3'][z_lst[1][0]])
+			print(m['psi2'][z_lst[1][0]])
+
 		t_arr = np.array(m['t'])
 		self.line_map['psidot_max'].set_xdata(t_arr)
 		self.line_map['psidot_max'].set_ydata(np.ones_like(t_arr) * self.ct.psidot_limit(self.speed))
@@ -260,6 +305,9 @@ class BezierPlot() :
 			v.autoscale_view()
 
 		self.fig.canvas.draw_idle()
+
+			
+
 
 	# def adapt(self, t) :
 	# 	return np.clip(t**self.gamma, 0.0, 1.0)
