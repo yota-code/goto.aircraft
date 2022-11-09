@@ -113,6 +113,7 @@ class BezierPlot() :
 			self.p_lst = [1, 1, 0.152, 0.245, 0.812, 0.13, 0.467, 0, 0, 0]
 			self.p_lst = [1, 0.93, 0.0367, 0.28, 0.945, 0.0, 0.18, 0.0, 0, 0]
 			self.p_lst = [1, 0.909, 0.0367, 0.416, 0.816, 0, 0.18, 0, 0, 0]
+			self.p_lst = [1.0, 1.0, 0.064, 0.445, 0.841, -0.011, 0.161, 0.0, 0.0, 0.0]
 
 		self.line_map = dict()
 		self.axe_map = dict()
@@ -172,7 +173,8 @@ class BezierPlot() :
 
 		j = 90.0 / self.final
 		
-		self.dg = DummyGlider(lon=circle_radius * j * 1.2 / reference_radius, vx=self.speed)
+		#self.dg = DummyGlider(lon=circle_radius * j * 1.2 / reference_radius, vx=self.speed)
+		self.dg = DummyGlider(lon=circle_radius * j / reference_radius, vx=self.speed)
 
 		for i in range(80000) :
 			d = reference_radius * self.dg.lon / (j * circle_radius)
