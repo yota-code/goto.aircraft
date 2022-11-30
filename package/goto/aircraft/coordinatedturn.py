@@ -29,8 +29,8 @@ class CoordinatedTurn() :
 		print(f"psidot_limit = {self.psidot_limit(spd)}")
 		print(f"psiddot_limit = {self.psiddot_limit(spd)}")
 
-	def psidot_limit(self, spd) :
-		return min( np.degrees(self.g * np.tan( np.radians(self.phi_max) ) / spd), self.psidot_max )
+	def psidot_limit(self, v_ms) :
+		return min( np.degrees(self.g * np.tan( np.radians(self.phi_max) ) / v_ms), self.psidot_max )
 
 	def psiddot_limit(self, spd) :
 		return self.psidot_limit(spd) * self.phidot_max / self.phi_max
@@ -41,11 +41,11 @@ class CoordinatedTurn() :
 		psidot_rad = np.radians(self.psidot_max)
 		return self.g * np.tan(phi_rad) / psidot_rad
 
-	def circle_radius(self, spd) :
-		psidot_limit = self.psidot_limit(spd)
-		psidot = np.where(spd < self.vtr, self.psidot_max, psidot_limit)
+	def circle_radius(self, v_ms) :
+		psidot_limit = self.psidot_limit(v_ms)
+		psidot = np.where(v_ms < self.vtr, self.psidot_max, psidot_limit)
 		t = math.tau / np.radians(psidot)
-		return spd * t / math.tau
+		return v_ms * t / math.tau
 
 	def radius_to_curvature(self, radius) :
 		aperture = radius / self.e
